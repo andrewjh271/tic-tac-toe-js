@@ -12,53 +12,53 @@ const board = (() => {
     [2, 4, 6],
   ];
 
-  function move(marker, position) {
-    if (squares[position]) return false;
+  const move = (marker, position) => (squares[position] ||= marker);
 
-    squares[position] = marker;
-    return true;
-  }
+  const getValue = (index) => squares[index];
 
-  function findWin() {
+  const findWin = () => {
     return lines.find((line) =>
       line
         .map((index) => squares[index])
         .reduce((acc, cur) => (acc === cur ? acc : null))
     );
-  }
+  };
 
-  function getValue(index) {
-    return squares[index];
-  }
+  const stalemate = () => {
+    for (let i = 0; i < 9; i++) if (!squares[i]) return false;
+    return true;
+  };
 
-  return { move, findWin, getValue };
+  return { move, findWin, stalemate, getValue };
 })();
 
 const gamePlay = (() => {
+  const status = document.querySelector('.status');
   let xToMove = true;
 
-  function switchPlayer() {
-    xToMove = !xToMove;
-  }
+  const switchPlayer = () => (xToMove = !xToMove);
 
-  function updateStatus(params) {
+  const updateStatus = (params) => {
     const winningLine = board.findWin();
+    displayController.displayBoard();
     if (winningLine) {
-      displayController.displayBoard();
+      status.innerHTML = xToMove ? '<h3>X Wins!</h3>' : '<h3>O Wins!</h3>';
+      displayController.makeUnavailableAll();
       displayController.displayWin(winningLine);
+    } else if (board.stalemate()) {
+      status.innerHTML = "It's a draw!";
     } else {
       switchPlayer();
       displayController.makeUnavailable(params.lastMove);
-      displayController.displayBoard();
     }
-  }
+  };
 
-  function move(e) {
+  const move = (e) => {
     const { index } = e.target.dataset;
     const marker = xToMove ? 'X' : 'O';
     board.move(marker, index);
     updateStatus({ lastMove: index });
-  }
+  };
 
   return { move };
 })();
@@ -67,34 +67,32 @@ const displayController = (() => {
   const squares = document.querySelectorAll('.square');
   squares.forEach((square) => square.addEventListener('click', gamePlay.move));
 
-  function displayBoard() {
+  const displayBoard = () => {
     squares.forEach((square, i) => {
       const marker = board.getValue(i);
       if (marker) {
         square.innerHTML = `<img src='/images/${marker}.svg'>`;
       }
     });
-  }
+  };
 
-  function displayWin(winningLine) {
-    makeUnavailableAll();
-    winningLine.forEach((index) => {
-      squares[index].classList.add('winning-line');
-    });
-  }
+  const displayWin = (winningLine) =>
+    winningLine.forEach((index) =>
+      squares[index].classList.add('winning-line')
+    );
 
-  function makeUnavailable(index) {
+  const makeUnavailable = (index) => {
     lastMove = squares[index];
     lastMove.removeEventListener('click', gamePlay.move);
     lastMove.classList.add('unavailable');
-  }
+  };
 
-  function makeUnavailableAll() {
+  const makeUnavailableAll = () => {
     squares.forEach((square) => {
       square.removeEventListener('click', gamePlay.move);
       square.classList.add('unavailable');
     });
-  }
+  };
 
-  return { makeUnavailable, displayBoard, displayWin };
+  return { makeUnavailable, makeUnavailableAll, displayBoard, displayWin };
 })();

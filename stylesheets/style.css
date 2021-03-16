@@ -1,0 +1,31 @@
+.board {
+  width: 500px;
+  height: 500px;
+  margin: 200px auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  grid-gap: 1px;
+  background-color: black;
+}
+
+.square {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: lightcyan;
+  cursor: pointer;
+}
+.square img {
+  width: 62%;
+}
+
+.unavailable {
+  cursor: default;
+}
+
+.winning-line {
+  background-color: lightseagreen;
+}
+
+/*# sourceMappingURL=style.css.map */

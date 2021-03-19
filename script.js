@@ -12,31 +12,40 @@ const board = (() => {
     [2, 4, 6],
   ];
 
-  const move = (marker, position) => (squares[position] ||= marker);
-  const getValue = (index) => squares[index];
-  const clear = () => squares = [];
-
-  const findWin = () => {
-    return lines.find((line) =>
-      line
-        .map((index) => squares[index])
-        .reduce((acc, cur) => (acc === cur ? acc : null))
-    );
+  const move = (marker, position) => {
+    squares[position] ||= marker;
   };
+
+  const getValue = (index) => squares[index];
+
+  const clear = () => (squares = []);
+
+  const findWin = () => lines.find((line) => line
+    .map((index) => squares[index])
+    .reduce((acc, cur) => (acc === cur ? acc : null)));
 
   const isStalemate = () => {
     for (let i = 0; i < 9; i++) if (!squares[i]) return false;
     return true;
   };
 
-  return { move, findWin, isStalemate, getValue, clear, squares };
+  return {
+    move,
+    getValue,
+    findWin,
+    isStalemate,
+    clear,
+  };
 })();
 
 const gamePlay = (() => {
   let xToMove = true;
-  let player1, player2;
+  let player1;
+  let player2;
 
-  const switchPlayer = () => (xToMove = !xToMove);
+  const switchPlayer = () => {
+    xToMove = !xToMove;
+  };
 
   const move = (e, i) => {
     const index = e ? e.target.dataset.index : i;
@@ -51,22 +60,28 @@ const gamePlay = (() => {
     if (winningLine) {
       if (xToMove) {
         player1.addPoint();
-        displayController.showResult('<h3>Player 1 Wins!</h3>');
+        displayController.showResult(`${player1.name} Wins!`);
       } else {
         player2.addPoint();
-        displayController.showResult('<h3>Player 2 Wins!</h3>');
+        displayController.showResult(`${player1.name} Wins!`);
       }
       userPanels.showScores(player1, player2);
       displayController.disableAll();
-      displayController.reset();
       displayController.displayWin(winningLine);
     } else if (board.isStalemate()) {
-      displayController.showResult("<h3>It's a draw!<h3>");
+      displayController.showResult("It's a draw!");
     } else {
       switchPlayer();
       displayController.disable(params.lastMove);
     }
   };
+
+  function newGame() {
+    userPanels.showScores(player1, player2);
+    userPanels.showGamePanel();
+    displayController.resetBoard();
+    displayController.enableAll();
+  }
 
   function newMatch(e) {
     e.preventDefault();
@@ -101,15 +116,11 @@ const gamePlay = (() => {
     newGame();
   }
 
-  function newGame() {
-    userPanels.restart();
-    userPanels.showScores(player1, player2);
-    userPanels.gameDisplay();
-    displayController.enableAll();
-    displayController.hideResult();
-  }
-
-  return { move, newMatch, newGame };
+  return {
+    move,
+    newMatch,
+    newGame,
+  };
 })();
 
 const displayController = (() => {
@@ -128,13 +139,15 @@ const displayController = (() => {
   };
 
   const displayWin = (winningLine) => {
-    winningLine.forEach((index) =>
-      squares[index].classList.add('winning-line')
-    );
+    winningLine.forEach((index) => squares[index].classList.add('winning-line'));
+  };
+
+  const resetWin = () => {
+    squares.forEach((square) => square.classList.remove('winning-line'));
   };
 
   function showResult(message) {
-    resultText.innerHTML = message;
+    resultText.innerHTML = `<h3>${message}</h3>`;
     result.style.width = '90%';
     result.style.height = '90%';
     rematch.style.display = 'block';
@@ -145,7 +158,7 @@ const displayController = (() => {
     result.style.width = '0';
     result.style.height = '0';
     rematch.style.display = 'none';
-  }
+  };
 
   const enableAll = () => {
     squares.forEach((square) => {
@@ -155,7 +168,7 @@ const displayController = (() => {
   };
 
   const disable = (index) => {
-    lastMove = squares[index];
+    const lastMove = squares[index];
     lastMove.removeEventListener('click', gamePlay.move);
     lastMove.classList.add('unavailable');
   };
@@ -167,11 +180,57 @@ const displayController = (() => {
     });
   };
 
-  const reset = () => {
-    squares.forEach((square) => square.classList.remove('winning-line'));
+  const resetBoard = () => {
+    resetWin();
+    hideResult();
+    board.clear();
+    displayBoard();
+  };
+
+  return {
+    enableAll,
+    disable,
+    disableAll,
+    displayBoard,
+    displayWin,
+    showResult,
+    resetBoard,
+  };
+})();
+
+const userPanels = (() => {
+  const setupForm = document.querySelector('.setup-panel');
+  const gamePanel = document.querySelector('.game-panel');
+  const restartButton = document.querySelector('.restart');
+  const newMatchButton = document.querySelector('.new-match');
+
+  setupForm.addEventListener('submit', gamePlay.newMatch);
+  restartButton.addEventListener('click', gamePlay.newGame);
+  newMatchButton.addEventListener('click', newMatch);
+
+  function newMatch() {
+    displayController.resetBoard();
+    showSetupPanel();
   }
 
-  return { enableAll, disable, disableAll, displayBoard, displayWin, showResult, hideResult, reset };
+  function showScores(player1, player2) {
+    const p1 = document.querySelector('.player1-score');
+    const p2 = document.querySelector('.player2-score');
+    p1.textContent = `${player1.name}: ${player1.getPoints()}`;
+    p2.textContent = `${player2.name}: ${player2.getPoints()}`;
+  }
+
+  function showGamePanel() {
+    setupForm.classList.add('hidden');
+    gamePanel.classList.remove('hidden');
+  }
+
+  function showSetupPanel() {
+    gamePanel.classList.add('hidden');
+    setupForm.classList.remove('hidden');
+  }
+
+  return { showScores, showGamePanel };
 })();
 
 const playerFactory = (name) => {
@@ -180,93 +239,46 @@ const playerFactory = (name) => {
   const addPoint = () => points++;
 
   return { name, getPoints, addPoint };
-}
+};
 
 const computerEasy = () => {
   const prototype = playerFactory('Computer (Easy)');
 
   const move = () => {
+    let i;
     do {
-      var i = Math.floor(Math.random() * 9)
+      i = Math.floor(Math.random() * 9);
+    } while (board.getValue(i));
+    gamePlay.move(null, i);
+  };
 
-    } while (board.getValue(i))
-    gamePlay.move(null, i)
-  }
-
-  return Object.assign({}, prototype, {move})
-}
+  return { ...prototype, move };
+};
 
 const computerMedium = () => {
   const prototype = playerFactory('Computer (Medium)');
 
   const move = () => {
+    let i;
     do {
-      var i = Math.floor(Math.random() * 9)
+      i = Math.floor(Math.random() * 9);
+    } while (board.getValue(i));
+    gamePlay.move(null, i);
+  };
 
-    } while (board.getValue(i))
-    gamePlay.move(null, i)
-  }
-
-  return Object.assign({}, prototype, {move})
-}
+  return { ...prototype, move };
+};
 
 const computerHard = () => {
   const prototype = playerFactory('Computer (Hard)');
 
   const move = () => {
+    let i;
     do {
-      var i = Math.floor(Math.random() * 9)
+      i = Math.floor(Math.random() * 9);
+    } while (board.getValue(i));
+    gamePlay.move(null, i);
+  };
 
-    } while (board.getValue(i))
-    gamePlay.move(null, i)
-  }
-
-  return Object.assign({}, prototype, {move})
-}
-
-const userPanels = (() => {
-  const gamePanel = document.querySelector('.game-panel');
-  const restartButton = document.querySelector('.restart');
-  const newMatchButton = document.querySelector('.new-match');
-
-  restartButton.addEventListener('click', restart);
-  newMatchButton.addEventListener('click', newMatch);
-
-  const setupForm = document.querySelector('.setup-panel');
-  setupForm.addEventListener('submit', gamePlay.newMatch);
-
-  function reset() {
-    displayController.reset();
-    board.clear();
-    displayController.displayBoard();
-  }
-
-  function restart() {
-    reset();
-    displayController.enableAll();
-    displayController.hideResult();
-  }
-
-  function newMatch() {
-    reset();
-    setupForm.classList.remove('hidden');
-    gamePanel.classList.add('hidden');
-    displayController.disableAll();
-    displayController.reset();
-  }
-
-  function showScores(player1, player2) {
-    const p1 = document.querySelector('.player1-score');
-    const p2 = document.querySelector('.player2-score');
-    p1.textContent = `${player1.name}: ${player1.getPoints()}`
-    p2.textContent = `${player2.name}: ${player2.getPoints()}`
-  }
-
-  function gameDisplay() {
-    setupForm.classList.add('hidden');
-    gamePanel.classList.remove('hidden');
-  }
-
-  return { showScores, gameDisplay, restart }
-
-})();
+  return { ...prototype, move };
+};

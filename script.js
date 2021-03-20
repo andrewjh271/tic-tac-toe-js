@@ -297,44 +297,35 @@ const playerFactory = (name) => {
   return { name, getPoints, addPoint };
 };
 
-const computerEasy = () => {
-  const prototype = playerFactory('Computer (Easy)');
+const computerFactory = (name) => {
+  const prototype = playerFactory(name);
 
-  const move = () => {
-    let i;
-    do {
-      i = Math.floor(Math.random() * 9);
-    } while (board.getValue(i));
-    gamePlay.move(null, i);
+  const randomMove = () => {
+    const available = [];
+    for (let i = 0; i < 9; i++) {
+      if (!board.getValue(i)) available.push(i);
+    }
+    const i = Math.floor(Math.random() * available.length);
+    gamePlay.move(null, available[i]);
   };
 
+  return { ...prototype, randomMove };
+};
+
+const computerEasy = () => {
+  const prototype = computerFactory('Computer (Easy)');
+  const move = () => prototype.randomMove();
   return { ...prototype, move };
 };
 
 const computerMedium = () => {
-  const prototype = playerFactory('Computer (Medium)');
-
-  const move = () => {
-    let i;
-    do {
-      i = Math.floor(Math.random() * 9);
-    } while (board.getValue(i));
-    gamePlay.move(null, i);
-  };
-
+  const prototype = computerFactory('Computer (Medium)');
+  const move = () => prototype.randomMove();
   return { ...prototype, move };
 };
 
 const computerHard = () => {
-  const prototype = playerFactory('Computer (Hard)');
-
-  const move = () => {
-    let i;
-    do {
-      i = Math.floor(Math.random() * 9);
-    } while (board.getValue(i));
-    gamePlay.move(null, i);
-  };
-
+  const prototype = computerFactory('Computer (Hard)');
+  const move = () => prototype.randomMove();
   return { ...prototype, move };
 };

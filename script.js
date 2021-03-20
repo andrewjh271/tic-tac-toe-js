@@ -63,7 +63,7 @@ const gamePlay = (() => {
         displayController.showResult(`${player1.name} Wins!`);
       } else {
         player2.addPoint();
-        displayController.showResult(`${player1.name} Wins!`);
+        displayController.showResult(`${player2.name} Wins!`);
       }
       userPanels.showScores(player1, player2);
       displayController.disableAll();
@@ -147,10 +147,12 @@ const displayController = (() => {
   };
 
   function showResult(message) {
-    resultText.innerHTML = `<h3>${message}</h3>`;
-    result.style.width = '90%';
-    result.style.height = '90%';
-    rematch.style.display = 'block';
+    result.style.width = '100%';
+    result.style.height = '100%';
+    setTimeout(() => {
+      resultText.innerHTML = `<h3>${message}</h3>`;
+      rematch.style.display = 'block';
+    }, 200);
   }
 
   const hideResult = () => {
@@ -210,6 +212,7 @@ const userPanels = (() => {
 
   function newMatch() {
     displayController.resetBoard();
+    displayController.disableAll();
     showSetupPanel();
   }
 

@@ -1,5 +1,7 @@
 *, *:before, *:after {
   box-sizing: inherit;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 500;
 }
 
 html {
@@ -7,39 +9,66 @@ html {
   height: 100%;
 }
 
-h3 {
-  padding: 0;
-  margin: 0;
+body {
+  background-image: linear-gradient(141deg, #ecedf3, #f1f1f1, #efeafb);
+}
+
+h1 {
+  margin: 50px;
   text-align: center;
+  font-size: 55px;
+  font-weight: 300;
+  color: #2b2980;
 }
 
+select {
+  padding-left: 5px;
+}
+
+button,
+input[type=submit],
+select {
+  border: none;
+  opacity: 0.75;
+  transition: 0.3s;
+}
 button:hover,
-input[type=submit]:hover {
+input[type=submit]:hover,
+select:hover {
   cursor: pointer;
+  opacity: 1;
 }
-
 button:focus,
+input[type=submit]:focus,
 select:focus {
   outline: none;
 }
 
 .board {
+  margin: 10px auto;
   width: 500px;
   height: 500px;
-  margin: 50px auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   grid-gap: 1px;
-  background-color: black;
+  background-image: radial-gradient(#7e848c, #4c4c4c61);
 }
 
 .square {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: lightcyan;
+  background-color: #daecff;
+  opacity: 1;
+}
+.square:hover {
+  opacity: 0.9;
   cursor: pointer;
+}
+.square.unavailable {
+  opacity: 1;
+  cursor: default;
 }
 .square:nth-child(1) {
   grid-column-start: 1;
@@ -84,41 +113,64 @@ select:focus {
 .result {
   grid-column: 1/4;
   grid-row: 1/4;
-  background-color: #2d4068;
-  opacity: 0.8;
-  height: 0;
-  width: 0;
   align-self: center;
   justify-self: center;
-  transition: 0.4s;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  height: 0;
+  width: 0;
+  color: white;
+  background-color: #1d325db5;
+  opacity: 0.98;
+  transition: 0.2s;
+}
+.result h3 {
+  font-size: 40px;
+  margin: 10px;
 }
 
 .rematch {
   display: none;
+  width: 150px;
+  height: 45px;
+  font-size: 16px;
+  border: none;
+  background-color: #daecff;
+  opacity: 0.7;
+  transition: 0.3s;
 }
-
-.unavailable {
-  cursor: default;
+.rematch:hover {
+  opacity: 1;
 }
 
 .winning-line {
-  background-color: lightseagreen;
-}
-
-.hidden {
-  transform: translateY(-400px);
+  background-color: #76d3f7;
 }
 
 .setup-panel {
   margin: auto;
-  width: 50%;
+  width: 500px;
   display: grid;
+  grid-template-columns: repeat(3, auto);
   grid-gap: 3px;
-  grid-template-columns: auto auto auto;
-  border: 1px solid red;
 }
-.setup-panel input, .setup-panel select {
+.setup-panel select {
   height: 30px;
+  border: none;
+  background-color: #ebe3ff;
+}
+.setup-panel input[type=submit] {
+  height: 35px;
+  background-color: #6ba9e7;
+}
+.setup-panel input[type=submit]:hover {
+  color: white;
+}
+.setup-panel h3 {
+  margin: 0;
+  padding: 0;
+  text-align: center;
 }
 
 .start-game {
@@ -127,13 +179,21 @@ select:focus {
 
 .game-panel {
   width: 500px;
-  margin: 100px auto 0;
+  margin: auto;
   display: grid;
-  border: 1px solid green;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 35px;
+  grid-gap: 3px;
+}
+.game-panel button {
+  height: 30px;
+  background-color: #ebe3ff;
 }
 .game-panel p {
+  align-self: end;
   margin: 0;
+  font-size: 18px;
+  color: #2b2980;
 }
 .game-panel .player2-score {
   text-align: end;
@@ -141,6 +201,10 @@ select:focus {
 
 .status {
   grid-column: 1/3;
+}
+
+.hidden {
+  display: none;
 }
 
 /*# sourceMappingURL=style.css.map */

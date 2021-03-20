@@ -66,10 +66,6 @@ select:focus {
   opacity: 0.9;
   cursor: pointer;
 }
-.square.unavailable {
-  opacity: 1;
-  cursor: default;
-}
 .square:nth-child(1) {
   grid-column-start: 1;
   grid-row-start: 1;
@@ -107,7 +103,15 @@ select:focus {
   grid-row-start: 3;
 }
 .square img {
+  width: 0;
+  height: 0;
+  transition: 0.3s;
+  transition-timing-function: cubic-bezier(0.03, 0.52, 0.48, 1.56);
+}
+
+.img-visible img {
   width: 62%;
+  height: auto;
 }
 
 .result {
@@ -205,6 +209,11 @@ select:focus {
 
 .hidden {
   display: none;
+}
+
+.unavailable {
+  opacity: inherit !important;
+  cursor: default !important;
 }
 
 /*# sourceMappingURL=style.css.map */

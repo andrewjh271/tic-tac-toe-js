@@ -39,6 +39,7 @@ const board = (() => {
 })();
 
 const gamePlay = (() => {
+  let xIsFirst = true;
   let xToMove = true;
   let player1;
   let player2;
@@ -68,19 +69,36 @@ const gamePlay = (() => {
       userPanels.showScores(player1, player2);
       displayController.disableAll();
       displayController.displayWin(winningLine);
+      xIsFirst = !xIsFirst;
+      userPanels.enableGameButtons();
     } else if (board.isStalemate()) {
       displayController.showResult("It's a draw!");
+      xIsFirst = !xIsFirst;
+      userPanels.enableGameButtons();
     } else {
       switchPlayer();
+      computerMove();
       displayController.disable(params.lastMove);
     }
   };
+
+  function computerMove() {
+    const player = xToMove ? player1 : player2;
+    if (!Object.prototype.hasOwnProperty.call(player, 'move')) {
+      displayController.reenable();
+      return;
+    }
+    displayController.disableAll();
+    setTimeout(() => player.move(), 700);
+  }
 
   function newGame() {
     userPanels.showScores(player1, player2);
     userPanels.showGamePanel();
     displayController.resetBoard();
     displayController.enableAll();
+    xToMove = xIsFirst;
+    computerMove();
   }
 
   function newMatch(e) {
@@ -113,6 +131,13 @@ const gamePlay = (() => {
       default:
         player2 = computerHard();
     }
+    if (Object.prototype.hasOwnProperty.call(player1, 'move')
+        && Object.prototype.hasOwnProperty.call(player2, 'move')) {
+      userPanels.disableGameButtons();
+    } else {
+      userPanels.enableGameButtons();
+    }
+    xIsFirst = true;
     newGame();
   }
 
@@ -134,7 +159,10 @@ const displayController = (() => {
   const displayBoard = () => {
     squares.forEach((square, i) => {
       const marker = board.getValue(i);
-      square.innerHTML = marker ? `<img src='/images/${marker}.svg'>` : '';
+      if (marker) {
+        square.innerHTML = `<img src='/images/${marker}.svg'>`;
+        setTimeout(() => square.classList.add('img-visible'), 5);
+      }
     });
   };
 
@@ -169,6 +197,15 @@ const displayController = (() => {
     });
   };
 
+  const reenable = () => {
+    squares.forEach((square, i) => {
+      if (!board.getValue(i)) {
+        square.addEventListener('click', gamePlay.move);
+        square.classList.remove('unavailable');
+      }
+    });
+  };
+
   const disable = (index) => {
     const lastMove = squares[index];
     lastMove.removeEventListener('click', gamePlay.move);
@@ -183,6 +220,7 @@ const displayController = (() => {
   };
 
   const resetBoard = () => {
+    squares.forEach((square) => square.classList.remove('img-visible'));
     resetWin();
     hideResult();
     board.clear();
@@ -191,6 +229,7 @@ const displayController = (() => {
 
   return {
     enableAll,
+    reenable,
     disable,
     disableAll,
     displayBoard,
@@ -207,8 +246,20 @@ const userPanels = (() => {
   const newMatchButton = document.querySelector('.new-match');
 
   setupForm.addEventListener('submit', gamePlay.newMatch);
-  restartButton.addEventListener('click', gamePlay.newGame);
-  newMatchButton.addEventListener('click', newMatch);
+
+  function enableGameButtons() {
+    restartButton.addEventListener('click', gamePlay.newGame);
+    restartButton.classList.remove('unavailable');
+    newMatchButton.addEventListener('click', newMatch);
+    newMatchButton.classList.remove('unavailable');
+  }
+
+  function disableGameButtons() {
+    restartButton.removeEventListener('click', gamePlay.newGame);
+    restartButton.classList.add('unavailable');
+    newMatchButton.removeEventListener('click', newMatch);
+    newMatchButton.classList.add('unavailable');
+  }
 
   function newMatch() {
     displayController.resetBoard();
@@ -233,7 +284,9 @@ const userPanels = (() => {
     setupForm.classList.remove('hidden');
   }
 
-  return { showScores, showGamePanel };
+  return {
+    showScores, showGamePanel, enableGameButtons, disableGameButtons,
+  };
 })();
 
 const playerFactory = (name) => {

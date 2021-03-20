@@ -175,12 +175,14 @@ const displayController = (() => {
   };
 
   function showResult(message) {
-    result.style.width = '100%';
-    result.style.height = '100%';
     setTimeout(() => {
-      resultText.innerHTML = `<h3>${message}</h3>`;
-      rematch.style.display = 'block';
-    }, 200);
+      result.style.width = '100%';
+      result.style.height = '100%';
+      setTimeout(() => {
+        resultText.innerHTML = `<h3>${message}</h3>`;
+        rematch.style.display = 'block';
+      }, 200);
+    }, 500);
   }
 
   const hideResult = () => {

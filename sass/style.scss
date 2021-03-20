@@ -5,7 +5,6 @@ $light-blue: #daecff;
 $medium-blue: #6ba9e7;
 $dark-blue: #2b2980;
 $pink: #ebe3ff;
-$cyan: #76d3f7;
 
 *, *:before, *:after {
   box-sizing: inherit;
@@ -133,7 +132,7 @@ select {
 }
 
 .winning-line {
-  background-color: $cyan;
+  background-color: $medium-blue;
 }
 
 // setup and game panel

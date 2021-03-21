@@ -61,30 +61,24 @@ const gamePlay = (() => {
     displayController.displayBoard();
     const winningLine = board.findWin();
     if (winningLine) {
-      if (xToMove) {
-        player1.addPoint(1);
-        displayController.showResult(`${player1.name} Wins!`);
-      } else {
-        player2.addPoint(1);
-        displayController.showResult(`${player2.name} Wins!`);
-      }
-      userPanels.showScores(player1, player2);
+      const winningPlayer = xToMove ? player1 : player2;
+      winningPlayer.addPoint(1);
+      displayController.showResult(`${winningPlayer.name} Wins!`);
       displayController.disableAll();
       displayController.displayWin(winningLine);
-      xIsFirst = !xIsFirst;
-      userPanels.enableGameButtons();
     } else if (board.isStalemate()) {
       player1.addPoint(0.5);
       player2.addPoint(0.5);
-      userPanels.showScores(player1, player2);
       displayController.showResult("It's a draw!");
-      xIsFirst = !xIsFirst;
-      userPanels.enableGameButtons();
     } else {
       displayController.disable(params.lastMove);
       switchPlayer();
       computerMove();
+      return;
     }
+    userPanels.showScores(player1, player2);
+    xIsFirst = !xIsFirst;
+    userPanels.enableGameButtons();
   };
 
   function computerMove() {

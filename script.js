@@ -317,40 +317,11 @@ const computerFactory = (name) => {
     return available;
   };
 
-  const randomMove = () => {
-    const available = findAvailableMoves();
-    const i = Math.floor(Math.random() * available.length);
-    gamePlay.move(null, available[i]);
-  };
-
-  return { ...prototype, randomMove, findAvailableMoves };
-};
-
-const computerEasy = () => {
-  const prototype = computerFactory('Computer (Easy)');
-  const move = () => prototype.randomMove();
-  return { ...prototype, move };
-};
-
-const computerMedium = () => {
-  const prototype = computerFactory('Computer (Medium)');
-  const move = () => prototype.randomMove();
-  return { ...prototype, move };
-};
-
-const computerHard = (isPlayer1) => {
-  const prototype = computerFactory('Computer (Hard)');
-  const move = () => {
-    const moves = minimax(isPlayer1).bestMoves;
-    const i = Math.floor(Math.random() * moves.length);
-    gamePlay.move(null, moves[i]);
-  };
-
   function minimax(maximizingPlayer) {
     const evaluation = evaluate(!maximizingPlayer);
     if (evaluation !== false) return { value: evaluation };
 
-    const available = prototype.findAvailableMoves();
+    const available = findAvailableMoves();
     let value;
     let bestMoves = [];
     if (maximizingPlayer) {
@@ -391,5 +362,43 @@ const computerHard = (isPlayer1) => {
     return false;
   };
 
-  return { ...prototype, move, minimax };
+  return { ...prototype, findAvailableMoves, minimax };
+};
+
+const computerEasy = () => {
+  const {
+    name, getPoints, addPoint, findAvailableMoves,
+  } = computerFactory('Computer (Easy)');
+
+  const move = () => {
+    const available = findAvailableMoves();
+    const i = Math.floor(Math.random() * available.length);
+    gamePlay.move(null, available[i]);
+  };
+
+  return {
+    name, getPoints, addPoint, move,
+  };
+};
+
+const computerMedium = () => {
+  const prototype = computerFactory('Computer (Medium)');
+  const move = () => prototype.randomMove();
+  return { ...prototype, move };
+};
+
+const computerHard = (isPlayer1) => {
+  const {
+    name, getPoints, addPoint, minimax,
+  } = computerFactory('Computer (Hard)');
+
+  const move = () => {
+    const moves = minimax(isPlayer1).bestMoves;
+    const i = Math.floor(Math.random() * moves.length);
+    gamePlay.move(null, moves[i]);
+  };
+
+  return {
+    name, getPoints, addPoint, move,
+  };
 };

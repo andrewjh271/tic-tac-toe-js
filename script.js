@@ -24,10 +24,7 @@ const board = (() => {
     .map((index) => squares[index])
     .reduce((acc, cur) => (acc === cur ? acc : null)));
 
-  const isStalemate = () => {
-    for (let i = 0; i < 9; i++) if (!squares[i]) return false;
-    return true;
-  };
+  const isStalemate = () => Object.keys(squares).length === 9;
 
   return {
     move,

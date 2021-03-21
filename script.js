@@ -62,10 +62,10 @@ const gamePlay = (() => {
     const winningLine = board.findWin();
     if (winningLine) {
       if (xToMove) {
-        player1.addPoint();
+        player1.addPoint(1);
         displayController.showResult(`${player1.name} Wins!`);
       } else {
-        player2.addPoint();
+        player2.addPoint(1);
         displayController.showResult(`${player2.name} Wins!`);
       }
       userPanels.showScores(player1, player2);
@@ -74,6 +74,9 @@ const gamePlay = (() => {
       xIsFirst = !xIsFirst;
       userPanels.enableGameButtons();
     } else if (board.isStalemate()) {
+      player1.addPoint(0.5);
+      player2.addPoint(0.5);
+      userPanels.showScores(player1, player2);
       displayController.showResult("It's a draw!");
       xIsFirst = !xIsFirst;
       userPanels.enableGameButtons();
@@ -299,9 +302,12 @@ const userPanels = (() => {
 })();
 
 const playerFactory = (name) => {
+  const allowedIncrements = [0.5, 1];
   let points = 0;
   const getPoints = () => points;
-  const addPoint = () => points++;
+  const addPoint = (value) => {
+    if (allowedIncrements.includes(value)) points += value;
+  };
 
   return { name, getPoints, addPoint };
 };

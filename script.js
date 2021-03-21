@@ -16,6 +16,8 @@ const board = (() => {
     squares[position] ||= marker;
   };
 
+  const undoMove = (position) => delete squares[position];
+
   const getValue = (index) => squares[index];
 
   const clear = () => (squares = []);
@@ -26,12 +28,16 @@ const board = (() => {
 
   const isStalemate = () => Object.keys(squares).length === 9;
 
+  const getSquares = () => squares;
+
   return {
     move,
+    undoMove,
     getValue,
     findWin,
     isStalemate,
     clear,
+    getSquares,
   };
 })();
 
@@ -41,9 +47,8 @@ const gamePlay = (() => {
   let player1;
   let player2;
 
-  const switchPlayer = () => {
-    xToMove = !xToMove;
-  };
+  const switchPlayer = () => (xToMove = !xToMove);
+  const evaluateWin = () => (xToMove ? 1 : -1);
 
   const move = (e, i) => {
     const index = e ? e.target.dataset.index : i;
@@ -73,9 +78,9 @@ const gamePlay = (() => {
       xIsFirst = !xIsFirst;
       userPanels.enableGameButtons();
     } else {
+      displayController.disable(params.lastMove);
       switchPlayer();
       computerMove();
-      displayController.disable(params.lastMove);
     }
   };
 
@@ -95,6 +100,7 @@ const gamePlay = (() => {
     displayController.resetBoard();
     displayController.enableAll();
     xToMove = xIsFirst;
+    displayController.disableAll();
     computerMove();
   }
 
@@ -112,7 +118,7 @@ const gamePlay = (() => {
         player1 = computerMedium();
         break;
       default:
-        player1 = computerHard();
+        player1 = computerHard(true);
     }
     const selection2 = this.querySelector('[name=player-two]').value;
     switch (selection2) {
@@ -126,7 +132,7 @@ const gamePlay = (() => {
         player2 = computerMedium();
         break;
       default:
-        player2 = computerHard();
+        player2 = computerHard(false);
     }
     if (Object.prototype.hasOwnProperty.call(player1, 'move')
         && Object.prototype.hasOwnProperty.call(player2, 'move')) {
@@ -138,10 +144,14 @@ const gamePlay = (() => {
     newGame();
   }
 
+  const getPlayer2 = () => player2;
+
   return {
     move,
     newMatch,
     newGame,
+    evaluateWin,
+    getPlayer2,
   };
 })();
 
@@ -299,16 +309,21 @@ const playerFactory = (name) => {
 const computerFactory = (name) => {
   const prototype = playerFactory(name);
 
-  const randomMove = () => {
+  const findAvailableMoves = () => {
     const available = [];
     for (let i = 0; i < 9; i++) {
       if (!board.getValue(i)) available.push(i);
     }
+    return available;
+  };
+
+  const randomMove = () => {
+    const available = findAvailableMoves();
     const i = Math.floor(Math.random() * available.length);
     gamePlay.move(null, available[i]);
   };
 
-  return { ...prototype, randomMove };
+  return { ...prototype, randomMove, findAvailableMoves };
 };
 
 const computerEasy = () => {
@@ -323,8 +338,58 @@ const computerMedium = () => {
   return { ...prototype, move };
 };
 
-const computerHard = () => {
+const computerHard = (isPlayer1) => {
   const prototype = computerFactory('Computer (Hard)');
-  const move = () => prototype.randomMove();
-  return { ...prototype, move };
+  const move = () => {
+    const moves = minimax(isPlayer1).bestMoves;
+    const i = Math.floor(Math.random() * moves.length);
+    gamePlay.move(null, moves[i]);
+  };
+
+  function minimax(maximizingPlayer) {
+    const evaluation = evaluate(!maximizingPlayer);
+    if (evaluation !== false) return { value: evaluation };
+
+    const available = prototype.findAvailableMoves();
+    let value;
+    let bestMoves = [];
+    if (maximizingPlayer) {
+      value = -99;
+      for (let i = 0; i < available.length; i++) {
+        const index = available[i];
+        board.move('X', index);
+        const leafValue = minimax(false).value;
+        if (leafValue > value) {
+          value = leafValue;
+          bestMoves = [index];
+        } else if (leafValue === value) {
+          bestMoves.push(index);
+        }
+        board.undoMove(index);
+      }
+    } else {
+      value = 99;
+      for (let i = 0; i < available.length; i++) {
+        const index = available[i];
+        board.move('O', index);
+        const leafValue = minimax(true).value;
+        if (leafValue < value) {
+          value = leafValue;
+          bestMoves = [index];
+        } else if (leafValue === value) {
+          bestMoves.push(index);
+        }
+        board.undoMove(index);
+      }
+    }
+    return { value, bestMoves };
+  }
+
+  const evaluate = (xLastMove) => {
+    if (board.findWin()) return xLastMove ? 1 : -1;
+    if (board.isStalemate()) return 0;
+    return false;
+  };
+
+  return { ...prototype, move, minimax };
 };

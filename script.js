@@ -28,8 +28,6 @@ const board = (() => {
 
   const isStalemate = () => Object.keys(squares).length === 9;
 
-  const getSquares = () => squares;
-
   return {
     move,
     undoMove,
@@ -37,7 +35,6 @@ const board = (() => {
     findWin,
     isStalemate,
     clear,
-    getSquares,
   };
 })();
 
@@ -47,7 +44,6 @@ const gamePlay = (() => {
   let player1;
   let player2;
 
-  const switchPlayer = () => (xToMove = !xToMove);
   const evaluateWin = () => (xToMove ? 1 : -1);
 
   const move = (e, i) => {
@@ -72,7 +68,7 @@ const gamePlay = (() => {
       displayController.showResult("It's a draw!");
     } else {
       displayController.disable(params.lastMove);
-      switchPlayer();
+      xToMove = !xToMove;
       computerMove();
       return;
     }
@@ -81,30 +77,27 @@ const gamePlay = (() => {
     userPanels.enableGameButtons();
   };
 
-  function computerMove() {
-    const player = xToMove ? player1 : player2;
-    if (!Object.prototype.hasOwnProperty.call(player, 'move')) {
+  const computerMove = () => {
+    const currentPlayer = xToMove ? player1 : player2;
+    if (!Object.prototype.hasOwnProperty.call(currentPlayer, 'move')) {
       displayController.reenable();
       return;
     }
     displayController.disableAll();
-    setTimeout(() => player.move(), 700);
-  }
+    setTimeout(() => currentPlayer.move(), 700);
+  };
 
-  function newGame() {
+  const newGame = () => {
     userPanels.showScores(player1, player2);
     userPanels.showGamePanel();
     displayController.resetBoard();
-    displayController.enableAll();
     xToMove = xIsFirst;
-    displayController.disableAll();
     computerMove();
-  }
+  };
 
   function newMatch(e) {
     e.preventDefault();
-    const selection1 = this.querySelector('[name=player-one]').value;
-    switch (selection1) {
+    switch (this.querySelector('[name=player-one]').value) {
       case 'Human':
         player1 = playerFactory('Player 1');
         break;
@@ -117,8 +110,7 @@ const gamePlay = (() => {
       default:
         player1 = computerHard(true);
     }
-    const selection2 = this.querySelector('[name=player-two]').value;
-    switch (selection2) {
+    switch (this.querySelector('[name=player-two]').value) {
       case 'Human':
         player2 = playerFactory('Player 2');
         break;
@@ -141,14 +133,11 @@ const gamePlay = (() => {
     newGame();
   }
 
-  const getPlayer2 = () => player2;
-
   return {
     move,
     newMatch,
     newGame,
     evaluateWin,
-    getPlayer2,
   };
 })();
 
@@ -159,6 +148,7 @@ const displayController = (() => {
   const rematch = result.querySelector('.rematch');
 
   rematch.addEventListener('click', gamePlay.newGame);
+  squares.forEach((square) => square.addEventListener('click', gamePlay.move));
 
   const displayBoard = () => {
     squares.forEach((square, i) => {
@@ -174,11 +164,7 @@ const displayController = (() => {
     winningLine.forEach((index) => squares[index].classList.add('winning-line'));
   };
 
-  const resetWin = () => {
-    squares.forEach((square) => square.classList.remove('winning-line'));
-  };
-
-  function showResult(message) {
+  const showResult = (message) => {
     setTimeout(() => {
       result.style.width = '100%';
       result.style.height = '100%';
@@ -187,7 +173,7 @@ const displayController = (() => {
         rematch.style.display = 'block';
       }, 200);
     }, 500);
-  }
+  };
 
   const hideResult = () => {
     resultText.innerHTML = '';
@@ -196,45 +182,29 @@ const displayController = (() => {
     rematch.style.display = 'none';
   };
 
-  const enableAll = () => {
-    squares.forEach((square) => {
-      square.addEventListener('click', gamePlay.move);
-      square.classList.remove('unavailable');
-    });
-  };
-
   const reenable = () => {
     squares.forEach((square, i) => {
-      if (!board.getValue(i)) {
-        square.addEventListener('click', gamePlay.move);
-        square.classList.remove('unavailable');
-      }
+      if (!board.getValue(i)) square.classList.remove('unavailable');
     });
   };
 
-  const disable = (index) => {
-    const lastMove = squares[index];
-    lastMove.removeEventListener('click', gamePlay.move);
-    lastMove.classList.add('unavailable');
-  };
+  const disable = (index) => squares[index].classList.add('unavailable');
 
   const disableAll = () => {
-    squares.forEach((square) => {
-      square.removeEventListener('click', gamePlay.move);
-      square.classList.add('unavailable');
-    });
+    squares.forEach((square) => square.classList.add('unavailable'));
   };
 
   const resetBoard = () => {
-    squares.forEach((square) => square.classList.remove('img-visible'));
-    resetWin();
+    squares.forEach((square) => {
+      square.classList.remove('img-visible');
+      square.classList.remove('winning-line');
+    });
     hideResult();
     board.clear();
     displayBoard();
   };
 
   return {
-    enableAll,
     reenable,
     disable,
     disableAll,
@@ -251,44 +221,43 @@ const userPanels = (() => {
   const restartButton = document.querySelector('.restart');
   const newMatchButton = document.querySelector('.new-match');
 
-  setupForm.addEventListener('submit', gamePlay.newMatch);
+  const player1score = document.querySelector('.player1-score');
+  const player2score = document.querySelector('.player2-score');
 
-  function enableGameButtons() {
-    restartButton.addEventListener('click', gamePlay.newGame);
+  const enableGameButtons = () => {
     restartButton.classList.remove('unavailable');
-    newMatchButton.addEventListener('click', newMatch);
     newMatchButton.classList.remove('unavailable');
-  }
+  };
 
-  function disableGameButtons() {
-    restartButton.removeEventListener('click', gamePlay.newGame);
+  const disableGameButtons = () => {
     restartButton.classList.add('unavailable');
-    newMatchButton.removeEventListener('click', newMatch);
     newMatchButton.classList.add('unavailable');
-  }
+  };
 
-  function newMatch() {
+  const newMatch = () => {
     displayController.resetBoard();
     displayController.disableAll();
     showSetupPanel();
-  }
+  };
 
-  function showScores(player1, player2) {
-    const p1 = document.querySelector('.player1-score');
-    const p2 = document.querySelector('.player2-score');
-    p1.textContent = `${player1.name}: ${player1.getPoints()}`;
-    p2.textContent = `${player2.name}: ${player2.getPoints()}`;
-  }
+  const showScores = (player1, player2) => {
+    player1score.textContent = `${player1.name}: ${player1.getPoints()}`;
+    player2score.textContent = `${player2.name}: ${player2.getPoints()}`;
+  };
 
-  function showGamePanel() {
+  const showGamePanel = () => {
     setupForm.classList.add('hidden');
     gamePanel.classList.remove('hidden');
-  }
+  };
 
-  function showSetupPanel() {
+  const showSetupPanel = () => {
     gamePanel.classList.add('hidden');
     setupForm.classList.remove('hidden');
-  }
+  };
+
+  setupForm.addEventListener('submit', gamePlay.newMatch);
+  newMatchButton.addEventListener('click', newMatch);
+  restartButton.addEventListener('click', gamePlay.newGame);
 
   return {
     showScores, showGamePanel, enableGameButtons, disableGameButtons,
@@ -327,39 +296,39 @@ const computerFactory = (name) => {
       return { value };
     }
 
-    const available = findAvailableMoves();
-    let value;
+    const availableMoves = findAvailableMoves();
+    let currentBestValue;
     let bestMoves = [];
     if (maximizingPlayer) {
-      value = -99;
-      for (let i = 0; i < available.length; i++) {
-        const index = available[i];
+      currentBestValue = -99;
+      for (let i = 0; i < availableMoves.length; i++) {
+        const index = availableMoves[i];
         board.move('X', index);
         const leafValue = minimax(false, depth - 1).value;
-        if (leafValue > value) {
-          value = leafValue;
+        if (leafValue > currentBestValue) {
+          currentBestValue = leafValue;
           bestMoves = [index];
-        } else if (leafValue === value) {
+        } else if (leafValue === currentBestValue) {
           bestMoves.push(index);
         }
         board.undoMove(index);
       }
     } else {
-      value = 99;
-      for (let i = 0; i < available.length; i++) {
-        const index = available[i];
+      currentBestValue = 99;
+      for (let i = 0; i < availableMoves.length; i++) {
+        const index = availableMoves[i];
         board.move('O', index);
         const leafValue = minimax(true, depth - 1).value;
-        if (leafValue < value) {
-          value = leafValue;
+        if (leafValue < currentBestValue) {
+          currentBestValue = leafValue;
           bestMoves = [index];
-        } else if (leafValue === value) {
+        } else if (leafValue === currentBestValue) {
           bestMoves.push(index);
         }
         board.undoMove(index);
       }
     }
-    return { value, bestMoves };
+    return { value: currentBestValue, bestMoves };
   }
 
   const evaluate = (xLastMove) => {

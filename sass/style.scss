@@ -206,4 +206,5 @@ select {
 .unavailable {
   opacity: inherit !important;
   cursor: default !important;
+  pointer-events: none;
 }

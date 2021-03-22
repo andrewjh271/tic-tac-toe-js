@@ -214,6 +214,7 @@ select:focus {
 .unavailable {
   opacity: inherit !important;
   cursor: default !important;
+  pointer-events: none;
 }
 
 /*# sourceMappingURL=style.css.map */

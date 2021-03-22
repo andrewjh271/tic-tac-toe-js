@@ -74,16 +74,17 @@ const gamePlay = (() => {
     }
     userPanels.showScores(player1, player2);
     xIsFirst = !xIsFirst;
-    userPanels.enableGameButtons();
   };
 
   const computerMove = () => {
     const currentPlayer = xToMove ? player1 : player2;
     if (!Object.prototype.hasOwnProperty.call(currentPlayer, 'move')) {
+      userPanels.enableGameButtons();
       displayController.reenable();
       return;
     }
     displayController.disableAll();
+    userPanels.disableGameButtons();
     setTimeout(() => currentPlayer.move(), 700);
   };
 
@@ -122,12 +123,6 @@ const gamePlay = (() => {
         break;
       default:
         player2 = computerHard(false);
-    }
-    if (Object.prototype.hasOwnProperty.call(player1, 'move')
-        && Object.prototype.hasOwnProperty.call(player2, 'move')) {
-      userPanels.disableGameButtons();
-    } else {
-      userPanels.enableGameButtons();
     }
     xIsFirst = true;
     newGame();
@@ -173,6 +168,7 @@ const displayController = (() => {
         rematch.style.display = 'block';
       }, 200);
     }, 500);
+    setTimeout(() => userPanels.enableGameButtons(), 1000);
   };
 
   const hideResult = () => {

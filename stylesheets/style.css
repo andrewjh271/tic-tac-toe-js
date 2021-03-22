@@ -10,7 +10,7 @@ html {
 }
 
 body {
-  background-image: linear-gradient(141deg, #ecedf3, #f1f1f1, #efeafb);
+  background-image: linear-gradient(141deg, #e6eaff, #f1f1f1, #f1e8ff);
 }
 
 h1 {
@@ -22,7 +22,7 @@ h1 {
 }
 
 select {
-  padding-left: 5px;
+  padding: 5px;
 }
 
 button,
@@ -43,6 +43,12 @@ input[type=submit]:focus,
 select:focus {
   outline: none;
 }
+button:active,
+input[type=submit]:active,
+select:active {
+  box-shadow: #b4aafd 1px 1px 7px 0px;
+  color: white;
+}
 
 .board {
   margin: 10px auto;
@@ -52,7 +58,7 @@ select:focus {
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   grid-gap: 1px;
-  background-image: radial-gradient(#7e848c, #4c4c4c61);
+  background-image: radial-gradient(#8694a7, 40%, #daecff);
 }
 
 .square {
@@ -63,7 +69,7 @@ select:focus {
   opacity: 1;
 }
 .square:hover {
-  opacity: 0.9;
+  opacity: 0.85;
   cursor: pointer;
 }
 .square:nth-child(1) {
@@ -162,7 +168,7 @@ select:focus {
 .setup-panel select {
   height: 30px;
   border: none;
-  background-color: #ebe3ff;
+  background-color: #d3c1ff;
 }
 .setup-panel input[type=submit] {
   height: 35px;
@@ -191,7 +197,7 @@ select:focus {
 }
 .game-panel button {
   height: 30px;
-  background-color: #ebe3ff;
+  background-color: #d3c1ff;
 }
 .game-panel p {
   align-self: end;

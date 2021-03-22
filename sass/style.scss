@@ -4,7 +4,7 @@ $main-width: 500px;
 $light-blue: #daecff;
 $medium-blue: #6ba9e7;
 $dark-blue: #2b2980;
-$pink: #ebe3ff;
+$pink: #d3c1ff;
 
 *, *:before, *:after {
   box-sizing: inherit;
@@ -18,7 +18,7 @@ html {
 }
 
 body {
-  background-image: linear-gradient(141deg, #ecedf3, #f1f1f1, #efeafb);
+  background-image: linear-gradient(141deg, #e6eaff, #f1f1f1, #f1e8ff);
 }
 
 h1 {
@@ -30,7 +30,7 @@ h1 {
 }
 
 select {
-  padding-left: 5px;
+  padding: 5px;
 }
 
 button,
@@ -48,17 +48,22 @@ select {
   &:focus {
     outline: none;
   }
+
+  &:active {
+    box-shadow: #b4aafd 1px 1px 7px 0px;
+    color: white;
+  }
 }
 
 .board {
   margin: 10px auto;
-  width: 500px;
-  height: 500px;
+  width: $main-width;
+  height: $main-width;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
   grid-gap: 1px;
-  background-image: radial-gradient(#7e848c, #4c4c4c61);
+  background-image: radial-gradient(#8694a7, 40%, #daecff);
 }
 
 .square {
@@ -69,7 +74,7 @@ select {
   opacity: 1;
   
   &:hover {
-    opacity: 0.9;
+    opacity: 0.85;
     cursor: pointer;
   }
 
@@ -88,11 +93,9 @@ select {
   }
 }
 
-.img-visible {
-  img {
-    width: 62%;
-    height: auto;
-  }
+.img-visible img {
+  width: 62%;
+  height: auto;
 }
 
 .result {

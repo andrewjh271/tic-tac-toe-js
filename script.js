@@ -69,23 +69,23 @@ const gamePlay = (() => {
     } else {
       displayController.disable(params.lastMove);
       xToMove = !xToMove;
-      computerMove();
+      checkForComputerMove();
       return;
     }
     userPanels.showScores(player1, player2);
     xIsFirst = !xIsFirst;
   };
 
-  const computerMove = () => {
+  const checkForComputerMove = () => {
     const currentPlayer = xToMove ? player1 : player2;
-    if (!Object.prototype.hasOwnProperty.call(currentPlayer, 'move')) {
-      userPanels.enableGameButtons();
+    if (Object.prototype.hasOwnProperty.call(currentPlayer, 'move')) {
+      displayController.disableAll();
+      userPanels.disableGameButtons();
+      setTimeout(() => currentPlayer.move(), 700);
+    } else {
       displayController.reenable();
-      return;
+      userPanels.enableGameButtons();
     }
-    displayController.disableAll();
-    userPanels.disableGameButtons();
-    setTimeout(() => currentPlayer.move(), 700);
   };
 
   const newGame = () => {
@@ -93,7 +93,7 @@ const gamePlay = (() => {
     userPanels.showGamePanel();
     displayController.resetBoard();
     xToMove = xIsFirst;
-    computerMove();
+    checkForComputerMove();
   };
 
   function newMatch(e) {

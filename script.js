@@ -112,7 +112,7 @@ const gamePlay = (() => {
         player1 = computerEasy();
         break;
       case 'Computer (Medium)':
-        player1 = computerMedium();
+        player1 = computerMedium(true);
         break;
       default:
         player1 = computerHard(true);
@@ -126,7 +126,7 @@ const gamePlay = (() => {
         player2 = computerEasy();
         break;
       case 'Computer (Medium)':
-        player2 = computerMedium();
+        player2 = computerMedium(false);
         break;
       default:
         player2 = computerHard(false);
@@ -317,9 +317,15 @@ const computerFactory = (name) => {
     return available;
   };
 
-  function minimax(maximizingPlayer) {
+  function minimax(maximizingPlayer, depth = 99) {
+    // evaluation is from caller's perspective (!maximizingPlayer)
     const evaluation = evaluate(!maximizingPlayer);
     if (evaluation !== false) return { value: evaluation };
+    if (depth === 0) {
+      // evaluate position at depth's limit to better than a loss but worse than a draw
+      const value = maximizingPlayer ? 0.5 : -0.5;
+      return { value };
+    }
 
     const available = findAvailableMoves();
     let value;
@@ -329,7 +335,7 @@ const computerFactory = (name) => {
       for (let i = 0; i < available.length; i++) {
         const index = available[i];
         board.move('X', index);
-        const leafValue = minimax(false).value;
+        const leafValue = minimax(false, depth - 1).value;
         if (leafValue > value) {
           value = leafValue;
           bestMoves = [index];
@@ -343,7 +349,7 @@ const computerFactory = (name) => {
       for (let i = 0; i < available.length; i++) {
         const index = available[i];
         board.move('O', index);
-        const leafValue = minimax(true).value;
+        const leafValue = minimax(true, depth - 1).value;
         if (leafValue < value) {
           value = leafValue;
           bestMoves = [index];
@@ -381,10 +387,20 @@ const computerEasy = () => {
   };
 };
 
-const computerMedium = () => {
-  const prototype = computerFactory('Computer (Medium)');
-  const move = () => prototype.randomMove();
-  return { ...prototype, move };
+const computerMedium = (isPlayer1) => {
+  const {
+    name, getPoints, addPoint, minimax,
+  } = computerFactory('Computer (Medium)');
+
+  const move = () => {
+    const moves = minimax(isPlayer1, 3).bestMoves;
+    const i = Math.floor(Math.random() * moves.length);
+    gamePlay.move(null, moves[i]);
+  };
+
+  return {
+    name, getPoints, addPoint, move,
+  };
 };
 
 const computerHard = (isPlayer1) => {

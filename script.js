@@ -78,7 +78,7 @@ const gamePlay = (() => {
 
   const checkForComputerMove = () => {
     const currentPlayer = xToMove ? player1 : player2;
-    if (Object.prototype.hasOwnProperty.call(currentPlayer, 'move')) {
+    if (currentPlayer.isComputer()) {
       displayController.disableAll();
       userPanels.disableGameButtons();
       setTimeout(() => currentPlayer.move(), 700);
@@ -268,7 +268,13 @@ const playerFactory = (name) => {
     if (allowedIncrements.includes(value)) points += value;
   };
 
-  return { name, getPoints, addPoint };
+  function isComputer() {
+    return Object.prototype.hasOwnProperty.call(this, 'move');
+  }
+
+  return {
+    name, getPoints, addPoint, isComputer,
+  };
 };
 
 const computerFactory = (name) => {
@@ -338,7 +344,7 @@ const computerFactory = (name) => {
 
 const computerEasy = () => {
   const {
-    name, getPoints, addPoint, findAvailableMoves,
+    name, getPoints, addPoint, findAvailableMoves, isComputer,
   } = computerFactory('Computer (Easy)');
 
   const move = () => {
@@ -348,13 +354,13 @@ const computerEasy = () => {
   };
 
   return {
-    name, getPoints, addPoint, move,
+    name, getPoints, addPoint, move, isComputer,
   };
 };
 
 const computerMedium = (isPlayer1) => {
   const {
-    name, getPoints, addPoint, minimax,
+    name, getPoints, addPoint, minimax, isComputer,
   } = computerFactory('Computer (Medium)');
 
   const move = () => {
@@ -364,13 +370,13 @@ const computerMedium = (isPlayer1) => {
   };
 
   return {
-    name, getPoints, addPoint, move,
+    name, getPoints, addPoint, move, isComputer,
   };
 };
 
 const computerHard = (isPlayer1) => {
   const {
-    name, getPoints, addPoint, minimax,
+    name, getPoints, addPoint, minimax, isComputer,
   } = computerFactory('Computer (Hard)');
 
   const move = () => {
@@ -380,6 +386,6 @@ const computerHard = (isPlayer1) => {
   };
 
   return {
-    name, getPoints, addPoint, move,
+    name, getPoints, addPoint, move, isComputer,
   };
 };

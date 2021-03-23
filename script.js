@@ -149,7 +149,7 @@ const displayController = (() => {
     squares.forEach((square, i) => {
       const marker = board.getValue(i);
       if (marker) {
-        square.innerHTML = `<img src='/images/${marker}.svg'>`;
+        square.innerHTML = `<img src='images/${marker}.svg'>`;
         setTimeout(() => square.classList.add('img-visible'), 5);
       }
     });

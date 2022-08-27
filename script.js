@@ -164,7 +164,7 @@ const displayController = (() => {
       result.style.width = '100%';
       result.style.height = '100%';
       setTimeout(() => {
-        resultText.innerHTML = `<h3>${message}</h3>`;
+        resultText.innerHTML = message;
         rematch.style.display = 'block';
       }, 200);
     }, 500);

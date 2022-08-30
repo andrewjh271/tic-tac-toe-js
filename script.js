@@ -67,20 +67,21 @@ const gamePlay = (() => {
     } else {
       displayController.disable(params.lastMove);
       xToMove = !xToMove;
-      checkForComputerMove();
+      getNextMove();
       return;
     }
     userPanels.showScores(player1, player2);
     xIsFirst = !xIsFirst;
   };
 
-  const checkForComputerMove = () => {
+  const getNextMove = () => {
     const currentPlayer = xToMove ? player1 : player2;
     if (currentPlayer.isComputer()) {
       displayController.disableAll();
       userPanels.disableGameButtons();
       setTimeout(() => currentPlayer.move(), 700);
     } else {
+      // wait for User's move
       displayController.reenable();
       userPanels.enableGameButtons();
     }
@@ -91,7 +92,7 @@ const gamePlay = (() => {
     userPanels.showGamePanel();
     displayController.resetBoard();
     xToMove = xIsFirst;
-    checkForComputerMove();
+    getNextMove();
   };
 
   function newMatch(e) {

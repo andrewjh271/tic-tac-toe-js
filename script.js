@@ -48,10 +48,11 @@ const gamePlay = (() => {
     const index = e ? e.target.dataset.index : i;
     const marker = xToMove ? 'X' : 'O';
     board.move(marker, index);
-    updateStatus({ lastMove: index });
+    updateStatus(index);
   };
 
-  const updateStatus = (params) => {
+  const updateStatus = (lastMove) => {
+    displayController.disable(lastMove);
     displayController.displayBoard();
     const winningLine = board.findWin();
     if (winningLine) {
@@ -65,7 +66,6 @@ const gamePlay = (() => {
       player2.addPoint(0.5);
       displayController.showResult("It's a draw!");
     } else {
-      displayController.disable(params.lastMove);
       xToMove = !xToMove;
       getNextMove();
       return;

@@ -44,8 +44,6 @@ const gamePlay = (() => {
   let player1;
   let player2;
 
-  const evaluateWin = () => (xToMove ? 1 : -1);
-
   const move = (e, i) => {
     const index = e ? e.target.dataset.index : i;
     const marker = xToMove ? 'X' : 'O';
@@ -132,7 +130,6 @@ const gamePlay = (() => {
     move,
     newMatch,
     newGame,
-    evaluateWin,
   };
 })();
 

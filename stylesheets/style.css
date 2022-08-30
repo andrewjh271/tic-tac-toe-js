@@ -131,8 +131,7 @@ select:active {
   height: 0;
   width: 0;
   color: white;
-  background-color: #1d325db5;
-  opacity: 0.98;
+  background-color: #1d325da3;
   transition: 0.2s;
 }
 .result h3 {
@@ -151,7 +150,8 @@ select:active {
   transition: 0.3s;
 }
 .rematch:hover {
-  opacity: 1;
+  transition: 0.5s;
+  opacity: 0.9;
 }
 
 .winning-line {

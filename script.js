@@ -97,7 +97,7 @@ const gamePlay = (() => {
 
   function newMatch(e) {
     e.preventDefault();
-    switch (this.querySelector('[name=player-one]').value) {
+    switch (this['player-one'].value) {
       case 'Human':
         player1 = playerFactory('Player 1');
         break;
@@ -110,7 +110,7 @@ const gamePlay = (() => {
       default:
         player1 = computerHard(true);
     }
-    switch (this.querySelector('[name=player-two]').value) {
+    switch (this['player-two'].value) {
       case 'Human':
         player2 = playerFactory('Player 2');
         break;
@@ -267,7 +267,7 @@ const playerFactory = (name) => {
   };
 
   function isComputer() {
-    return Object.prototype.hasOwnProperty.call(this, 'move');
+    return Object.hasOwn(this, 'move');
   }
 
   return {
